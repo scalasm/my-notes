@@ -1,0 +1,26 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+boto3 = "*"
+jinja2 = "*"
+pynamodb = "*"
+jsons = "*"
+
+[dev-packages]
+coverage = "*"
+pytest = "*"
+pytest-icdiff = "*"
+pylint = "*"
+pytest-mock = "*"
+requests = "*"
+flake8 = "*"
+pytest-pythonpath = "*"
+
+[requires]
+python_version = "3.8"
+
+[dev-packages.moto]
+extras = [ "dynamodb", "s3",]

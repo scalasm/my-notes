@@ -1,0 +1,11 @@
+localstack/
+.env
+.converage
+.gitignore
+.vscode/
+tests/
+__pycache__
+.pytest-cache
+**/*.egg-info
+**/*.dist-info
+
