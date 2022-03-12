@@ -57,6 +57,6 @@ def handler_get_by_id(event, context) -> dict:
 
     id = lambda_utils.get_path_parameter("id")
 
-    note = usecase.get_note_by_id(id)
+    note = usecase.find_note_by_id(id)
 
     return lambda_utils.to_json_response(note)

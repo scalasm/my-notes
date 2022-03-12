@@ -22,14 +22,16 @@ class Note(DomainEntity):
     type: NoteType
     creation_time: datetime
     tags: List[str]
+    version: int
 
     """Entity class representing metadata associated to a Note entity"""
-    def __init__(self, author_id: str, type: NoteType, creation_time: datetime, tags: List[str] = None, id: str = None) -> None:
+    def __init__(self, author_id: str, type: NoteType, creation_time: datetime, tags: List[str] = None, id: str = None, version: int = None) -> None:
         super().__init__(id)
         self.author_id = author_id
         self.creation_time = creation_time
         self.type = type
         self.tags = tags or {}
+        self.version = version or None
 
 class NoteRepository(ABC):
     @abstractmethod
@@ -37,7 +39,15 @@ class NoteRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_id(self, id: str) -> None:
+    def find_by_id(self, id: str) -> None:
+        pass
+
+    @abstractmethod
+    def delete_by_id(self, id: str) -> None:
+        pass
+
+    @abstractmethod
+    def find_all(self) -> None:
         pass
 
 @wrap_exceptions
@@ -68,5 +78,5 @@ class CreateNoteUseCase:
         
         return note
 
-    def get_note_by_id(self, note_id: str) -> Note:
-        return self.note_repository.get_by_id(note_id)
+    def find_note_by_id(self, note_id: str) -> Note:
+        return self.note_repository.find_by_id(note_id)

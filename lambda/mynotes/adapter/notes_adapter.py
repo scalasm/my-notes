@@ -1,5 +1,5 @@
-import os 
-from pynamodb.attributes import UnicodeAttribute, UTCDateTimeAttribute, UnicodeSetAttribute
+import logging
+from pynamodb.attributes import UnicodeAttribute, UTCDateTimeAttribute, UnicodeSetAttribute, VersionAttribute
 from pynamodb.models import Model
 
 from mynotes.core.notes import Note, NoteRepository, NoteType
@@ -20,6 +20,7 @@ class NoteModel(Model):
     author_id = UnicodeAttribute()
     type = UnicodeAttribute()
     tags = UnicodeSetAttribute()
+    version = VersionAttribute(null=True)
 
 class DynamoDBNoteRepository(NoteRepository):
     def save(self, note: Note) -> None:
@@ -27,10 +28,27 @@ class DynamoDBNoteRepository(NoteRepository):
         
         note_model.save()
 
-    def get_by_id(self, id: str) -> Note:
-        note_model = NoteModel.get(id)
+    def find_by_id(self, id: str) -> Note:
+        try:
+            note_model = NoteModel.get(id)
 
-        return map_to_note(note_model)
+            return map_to_note(note_model)
+        except NoteModel.DoesNotExist:
+            logging.debug(f"Note with id {id} was not found!")
+            return None
+
+    def delete_by_id(self, id: str) -> None:
+        try:
+            # XXX Review this implementation - I should not need to do 
+            # a "get" before a "delete" :|
+            note_model = NoteModel.get(id)
+            note_model.delete()
+#            note_model.delete(NoteModel.id == id)
+        except NoteModel.DoesNotExist:
+            logging.debug(f"Note with id {id} was not found!")
+
+    def find_all(self) -> None:
+        pass
 
 def map_to_note_model(note: Note) -> NoteModel:
     model = NoteModel(
@@ -40,6 +58,8 @@ def map_to_note_model(note: Note) -> NoteModel:
     model.author_id = note.author_id
     model.type = note.type.value
     model.tags = set(note.tags)
+    if note.version:
+        model.version = note.version
 
     return model
 
@@ -49,5 +69,6 @@ def map_to_note(note_model: NoteModel) -> Note:
         type=NoteType(note_model.type),
         creation_time = note_model.creation_time,
         tags=list(note_model.tags),
-        author_id=note_model.author_id
+        author_id=note_model.author_id,
+        version = note_model.version
     )
