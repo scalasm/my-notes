@@ -47,7 +47,7 @@ def handler_create_note(event, context) -> dict:
     return lambda_utils.to_json_response(note)
 
 @with_exception_management
-def handler_get_by_id(event, context) -> dict:
+def handler_find_by_id(event, context) -> dict:
     """Handler for returning a note by its id.
     Args:
         event: the AWS Lambda event
@@ -58,7 +58,7 @@ def handler_get_by_id(event, context) -> dict:
     """
     print(json.dumps(event))
 
-    id = lambda_utils.get_path_parameter("id")
+    id = lambda_utils.get_path_parameter(event, "id")
 
     note = usecase.find_note_by_id(id)
 
@@ -76,7 +76,7 @@ def handler_delete_by_id(event, context) -> dict:
     """
     print(json.dumps(event))
 
-    id = lambda_utils.get_path_parameter("id")
+    id = lambda_utils.get_path_parameter(event, "id")
 
     usecase.delete_note_by_id(id)
 
