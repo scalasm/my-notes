@@ -67,25 +67,63 @@ export class MyNotesApiStack extends cdk.NestedStack {
     //   }
     // });
 
+    const lambdaEnvironment = {
+      "NOTES_CONTENT_BUCKET_NAME": notesContentBucket.bucketName,
+      "NOTES_TABLE_NAME": notesTable.tableName
+    }
+
     const createNoteFunction = new pylambda.PythonFunction(this, "CreateNoteFunction", {
       functionName: "CreateNote",
       description: "Create note",
       vpc: props.vpc,
       entry: "../lambda", // required
-      index: "mynotes/port/note.py",
+      index: "mynotes/port/notes.py",
       handler: "handler_create_note",
       runtime: lambda.Runtime.PYTHON_3_8,
       memorySize: 256,
-      environment: {
-        "NOTES_CONTENT_BUCKET_NAME": notesContentBucket.bucketName,
-        "NOTES_TABLE_NAME": notesTable.tableName
-      }
+      environment: lambdaEnvironment
     });
 
     notesTable.grantFullAccess(createNoteFunction);
     notesContentBucket.grantReadWrite(createNoteFunction);
 
     noteResource.addMethod("POST", new apigw.LambdaIntegration(createNoteFunction))
+
+    const noteResourceWithId = noteResource.addResource("{id}");
+    
+    const deleteNoteFunction = new pylambda.PythonFunction(this, "DeleteNoteFunction", {
+      functionName: "DeleteNote",
+      description: "Delete note",
+      vpc: props.vpc,
+      entry: "../lambda", // required
+      index: "mynotes/port/notes.py",
+      handler: "handler_delete_by_id",
+      runtime: lambda.Runtime.PYTHON_3_8,
+      memorySize: 256,
+      environment: lambdaEnvironment
+    });
+
+    notesTable.grantFullAccess(deleteNoteFunction);
+    notesContentBucket.grantReadWrite(deleteNoteFunction);
+
+    noteResourceWithId.addMethod("DELETE", new apigw.LambdaIntegration(deleteNoteFunction))
+
+    const findNoteByIdFunction = new pylambda.PythonFunction(this, "FindNoteByIdFunction", {
+      functionName: "FindNoteById",
+      description: "Find note by id",
+      vpc: props.vpc,
+      entry: "../lambda", // required
+      index: "mynotes/port/notes.py",
+      handler: "handler_find_by_id",
+      runtime: lambda.Runtime.PYTHON_3_8,
+      memorySize: 256,
+      environment: lambdaEnvironment
+    });
+
+    notesTable.grantFullAccess(findNoteByIdFunction);
+    notesContentBucket.grantReadWrite(findNoteByIdFunction);
+
+    noteResourceWithId.addMethod("GET", new apigw.LambdaIntegration(findNoteByIdFunction))
 
     // TODO  DELETE /note/{noteId}
 
