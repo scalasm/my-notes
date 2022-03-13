@@ -43,8 +43,24 @@ class TestDynamoDBNoteRepository:
         )
 
         note_repository.save(note)
+
+        # This whould throw a NotFound exception if the note is not in table        
+        note_model = NoteModel.get(note.id)
+        assert note_model.tags == {"test"}
+
+    def test_create_note_without_tags(self, note_repository: DynamoDBNoteRepository) -> None:
+        note = Note(
+            author_id = "mario",
+            type = NoteType.FREE,
+            creation_time = datetime.now(timezone.utc),
+            # No tags
+        )
+
+        note_repository.save(note)
         
-        self._assert_note_exists(note.id)
+        note_model = NoteModel.get(note.id)
+        # There are no tags (note_model.tags is none)
+        assert not note_model.tags
 
     def test_find_by_id_existing_note(self, note_repository: DynamoDBNoteRepository) -> None:
         existing_note_model = self._create_test_note_model()
