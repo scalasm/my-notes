@@ -1,6 +1,6 @@
 import pytest
-from mynotes.core.architecture import ObjectStore, User
-from mynotes.core.notes import (CreateNoteUseCase, Note, NoteRepository,
+from mynotes.core.architecture import ObjectStore, ResourceNotFoundException, User
+from mynotes.core.notes import (NoteUseCases, Note, NoteRepository,
                                 NoteType)
 from pytest_mock import MockerFixture
 
@@ -14,13 +14,13 @@ def mock_note_repository(mocker: MockerFixture) -> NoteRepository:
     return mocker.Mock(spec=NoteRepository)
 
 @pytest.fixture
-def usecase(mock_bucket_adapter: ObjectStore, mock_note_repository: NoteRepository) -> CreateNoteUseCase:
-    return CreateNoteUseCase(mock_bucket_adapter, mock_note_repository)
+def usecase(mock_bucket_adapter: ObjectStore, mock_note_repository: NoteRepository) -> NoteUseCases:
+    return NoteUseCases(mock_bucket_adapter, mock_note_repository)
 
-class TestCreateNoteUseCase:
+class TestNoteUseCases:
 
     def test_create_note(self, 
-        usecase: CreateNoteUseCase, 
+        usecase: NoteUseCases, 
         mock_bucket_adapter: ObjectStore, mock_note_repository: NoteRepository) -> None:
         content = """
     #This is a title
@@ -38,3 +38,26 @@ class TestCreateNoteUseCase:
         mock_bucket_adapter.store.assert_called_once_with(f"notes/{note.id}.md", content)
 
         mock_note_repository.save.assert_called_once()
+
+    def test_find_note_by_id_must_throw_exception_if_note_does_not_exist(self, 
+        usecase: NoteUseCases, 
+        mock_bucket_adapter: ObjectStore, mock_note_repository: NoteRepository) -> None:
+
+        mock_note_repository.find_by_id.return_value = None
+
+        with pytest.raises(ResourceNotFoundException):
+            usecase.find_note_by_id("some-id")
+
+    def test_find_note_by_id(self, 
+        usecase: NoteUseCases, 
+        mock_bucket_adapter: ObjectStore, mock_note_repository: NoteRepository) -> None:
+
+        test_note = Note(id="test-id", author_id="test-user")
+
+        mock_note_repository.find_by_id.return_value = test_note
+
+        found_note = usecase.find_note_by_id("some-id")
+
+        mock_note_repository.find_by_id.assert_called_once()
+        assert found_note == test_note
+    

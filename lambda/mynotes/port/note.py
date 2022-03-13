@@ -5,7 +5,7 @@ from mynotes.adapter.config import NOTES_CONTENT_BUCKET_NAME
 from mynotes.adapter.notes_adapter import DynamoDBNoteRepository
 from mynotes.adapter.s3_bucket_adapter import S3BucketAdapter
 from mynotes.core.architecture import User
-from mynotes.core.notes import CreateNoteUseCase
+from mynotes.core.notes import NoteUseCases
 from mynotes.port import lambda_utils
 
 object_store = S3BucketAdapter(
@@ -15,7 +15,7 @@ object_store = S3BucketAdapter(
 
 note_repository = DynamoDBNoteRepository()
 
-usecase = CreateNoteUseCase(object_store, note_repository)
+usecase = NoteUseCases(object_store, note_repository)
 
 def handler_create_note(event, context) -> dict:
     """Main entrypoint for this AWS Lambda function: it routes the AWS Event (Application Gateway) to

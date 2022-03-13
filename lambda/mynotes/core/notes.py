@@ -6,7 +6,7 @@ from datetime import datetime
 from enum import Enum
 from typing import List
 
-from mynotes.core.architecture import (DomainEntity, ObjectStore, User,
+from mynotes.core.architecture import (DomainEntity, ObjectStore, ResourceNotFoundException, User,
                                        wrap_exceptions)
 from mynotes.core.utils.common import now
 
@@ -25,11 +25,11 @@ class Note(DomainEntity):
     version: int
 
     """Entity class representing metadata associated to a Note entity"""
-    def __init__(self, author_id: str, type: NoteType, creation_time: datetime, tags: List[str] = None, id: str = None, version: int = None) -> None:
+    def __init__(self, id: str = None, author_id: str = None, type: NoteType = None, creation_time: datetime = None, tags: List[str] = None, version: int = None) -> None:
         super().__init__(id)
         self.author_id = author_id
         self.creation_time = creation_time
-        self.type = type
+        self.type = type or NoteType.FREE
         self.tags = tags or {}
         self.version = version or None
 
@@ -51,7 +51,10 @@ class NoteRepository(ABC):
         pass
 
 @wrap_exceptions
-class CreateNoteUseCase:
+class NoteUseCases:
+    """
+        Use cases supported for Notes.
+    """
     bucket_adapter: ObjectStore
     note_repository: NoteRepository
 
@@ -60,6 +63,15 @@ class CreateNoteUseCase:
         self.note_repository = note_repository
 
     def create_note(self, author: User, content: str) -> Note:
+        """
+        Create a new note, based on Markdown standard.
+    
+        Args:
+            author: the identified for the user who is creating this note
+            content: the content of the note 
+        Returns:
+            the Note instance representing the created note
+        """
         note = Note(
             id = str(uuid.uuid4()),
             creation_time = now(),
@@ -79,4 +91,21 @@ class CreateNoteUseCase:
         return note
 
     def find_note_by_id(self, note_id: str) -> Note:
-        return self.note_repository.find_by_id(note_id)
+        """
+        Returns a note by i, based on Markdown standard.
+    
+        Args:
+            author: the identified for the user who is creating this note
+            content: the content of the note 
+        Returns:
+            the Note instance representing the created note
+
+        Throws:
+            a ResourceNotFoundException if there is not such note
+        """
+
+        note = self.note_repository.find_by_id(note_id)
+        if not note:
+            raise ResourceNotFoundException("Note", note_id)
+        return note
+         

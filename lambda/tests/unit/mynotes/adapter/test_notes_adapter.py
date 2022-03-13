@@ -36,10 +36,10 @@ def note_repository(notes_table: str) -> DynamoDBNoteRepository:
 class TestDynamoDBNoteRepository:
     def test_create_note(self, note_repository: DynamoDBNoteRepository) -> None:
         note = Note(
-            "mario",
-            NoteType.FREE,
-            datetime.now(timezone.utc),
-            ["test"]
+            author_id = "mario",
+            type = NoteType.FREE,
+            creation_time = datetime.now(timezone.utc),
+            tags = ["test"]
         )
 
         note_repository.save(note)
