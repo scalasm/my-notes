@@ -80,11 +80,10 @@ class NoteUseCases:
             tags = tags or []
         )
 
-        content = content.strip()
-
-        object_key = f"notes/{note.id}.md"
-
-        self.bucket_adapter.store(object_key, content)
+        self.bucket_adapter.store(
+            self._get_object_key_for_note(note.id),
+            content.strip()
+        )
 
         self.note_repository.save(note)
         
@@ -117,4 +116,10 @@ class NoteUseCases:
             nothing
         """
         self.note_repository.delete_by_id(note_id)
-         
+
+        self.bucket_adapter.delete(
+            self._get_object_key_for_note(note_id)
+        )
+
+    def _get_object_key_for_note(self, note_id: str) -> str:
+        return f"notes/{note_id}.md"

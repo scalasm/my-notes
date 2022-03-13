@@ -90,6 +90,9 @@ class ObjectStore:
     def load(self, object_key: str) -> str:
         pass
 
+    @abstractmethod
+    def delete(self, object_key: str) -> None:
+        pass
 
 class ContentUploadException(ApplicationException):
     """

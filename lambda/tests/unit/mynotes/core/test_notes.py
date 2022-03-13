@@ -69,3 +69,4 @@ class TestNoteUseCases:
 
         mock_note_repository.delete_by_id.assert_called_once_with("test-id")
         
+        mock_bucket_adapter.delete.assert_called_once_with("notes/test-id.md")

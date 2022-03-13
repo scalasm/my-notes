@@ -26,3 +26,10 @@ class S3BucketAdapter(ObjectStore):
         content = object.get()['Body'].read().decode('utf-8')
 
         return content
+
+    def delete(self, object_key: str) -> None:
+        object = self.s3_resource.Object(self.bucket_name, object_key)
+        # We don't care about the response - either the object was deleted (if present)
+        # or it was not present!
+        object.delete()
+
