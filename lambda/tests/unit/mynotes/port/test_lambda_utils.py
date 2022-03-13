@@ -1,12 +1,14 @@
 import pytest
-
 from typing import Optional
 
 from mynotes.port.lambda_utils import (
     get_path_parameter,
+    get_path_parameter_with_default,
     get_json_body,
     to_json_response
 )
+
+from mynotes.core.architecture import ValidationException
 
 to_json_response_test_data = [
     ({"message":"test"}, 200, None, 
@@ -37,14 +39,32 @@ TEST_EVENT = {
 }
 
 get_path_parameter_test_data = [
+    (TEST_EVENT, "param", "test"),
+]
+
+@pytest.mark.parametrize("event,param_name,expected_response", get_path_parameter_test_data)
+def test_get_path_parameter(event: dict, param_name: str, expected_response: Optional[str]) -> None:
+    assert get_path_parameter(event, param_name) == expected_response
+
+get_path_parameter_test_data = [
+    (TEST_EVENT, "not-existing-param"),
+    ({ }, "not-existing-param")
+]
+
+@pytest.mark.parametrize("event,param_name", get_path_parameter_test_data)
+def test_get_path_parameter_expect_exception(event: dict, param_name: str) -> None:
+    with pytest.raises(ValidationException):
+        get_path_parameter(event, param_name)
+
+get_path_parameter_with_default_test_data = [
     (TEST_EVENT, "param", None, "test"),
     (TEST_EVENT, "not_present_param", "something", "something"),
     ({ }, "param", "something", "something"),
 ]
 
-@pytest.mark.parametrize("event,param_name,default_value,expected_response", get_path_parameter_test_data)
-def test_get_path_parameter(event: dict, param_name: str, default_value: str, expected_response: Optional[str]) -> None:
-    assert get_path_parameter(event, param_name, default_value) == expected_response
+@pytest.mark.parametrize("event,param_name,default_value,expected_response", get_path_parameter_with_default_test_data)
+def test_get_path_parameter_with_default(event: dict, param_name: str, default_value: str, expected_response: Optional[str]) -> None:
+    assert get_path_parameter_with_default(event, param_name, default_value) == expected_response
 
 get_json_body_test_data = [
     ({"body": "{\"message\": \"test\"}" }, {"message": "test"}),

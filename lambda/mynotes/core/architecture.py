@@ -12,6 +12,12 @@ class ApplicationException(Exception):
     """Base class for all application exception"""
     pass
 
+class ValidationException(ApplicationException):
+    """Something happened about the required input values"""
+    def __init__(self, attribute_name: str, error_message: Any) -> None:
+        self.attribute_name = attribute_name
+        self.error_message = error_message
+
 class RepositoryException(ApplicationException):
     """Exception throws because of the errors in the repository layer"""
     pass

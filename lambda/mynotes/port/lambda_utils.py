@@ -4,7 +4,31 @@ import jsons
 from typing import Dict, Optional, Any
 import base64
 
-def get_path_parameter(event, param_name: str, default_value: str = "") -> Optional[str]:
+from mynotes.core.architecture import ApplicationException, ResourceNotFoundException, ValidationException
+
+def get_path_parameter(event, param_name: str) -> Optional[str]:
+    """Returns the value for the specified path parameter
+    
+    Args:
+        event: the AWS Lambda event (usually Application Gateway event)
+        param_name: the name of the path parameter
+
+    Returns:
+        the value in the event object of the specified path parameter
+    Throws:
+        ValidationException if there are no such path parameter
+    """
+    value = None
+    map = event.get("pathParameters")
+    if map and param_name in map:
+        value = map.get(param_name, None)
+    
+    if not value:
+        raise ValidationException(param_name, "No such path parameter was found!")
+
+    return value
+
+def get_path_parameter_with_default(event, param_name: str, default_value: str = "") -> Optional[str]:
     """Returns the value for the specified path parameter or the 'default_value' if not found
     
     Args:
