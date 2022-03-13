@@ -62,7 +62,7 @@ class NoteUseCases:
         self.bucket_adapter = bucket_adapter
         self.note_repository = note_repository
 
-    def create_note(self, author: User, content: str) -> Note:
+    def create_note(self, author: User, content: str, tags: List[str] = None) -> Note:
         """
         Create a new note, based on Markdown standard.
     
@@ -77,7 +77,7 @@ class NoteUseCases:
             creation_time = now(),
             author_id = author.user_id, 
             type = NoteType.FREE,
-            tags = ["note"]
+            tags = tags or []
         )
 
         content = content.strip()
@@ -92,20 +92,29 @@ class NoteUseCases:
 
     def find_note_by_id(self, note_id: str) -> Note:
         """
-        Returns a note by i, based on Markdown standard.
+        Returns a note by its id, based on Markdown standard.
     
         Args:
-            author: the identified for the user who is creating this note
-            content: the content of the note 
+            note_id: the id of the wanted note
         Returns:
-            the Note instance representing the created note
+            the Note instance matching the required id
 
         Throws:
             a ResourceNotFoundException if there is not such note
         """
-
         note = self.note_repository.find_by_id(note_id)
         if not note:
             raise ResourceNotFoundException("Note", note_id)
         return note
+
+    def delete_note_by_id(self, note_id: str) -> Note:
+        """
+        Deletes a note with the specified id, if present.
+    
+        Args:
+            note_id: the id of the wanted note
+        Returns:
+            nothing
+        """
+        self.note_repository.delete_by_id(note_id)
          

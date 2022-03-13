@@ -56,8 +56,16 @@ class TestNoteUseCases:
 
         mock_note_repository.find_by_id.return_value = test_note
 
-        found_note = usecase.find_note_by_id("some-id")
+        found_note = usecase.find_note_by_id("test-id")
 
-        mock_note_repository.find_by_id.assert_called_once()
+        mock_note_repository.find_by_id.assert_called_once_with("test-id")
         assert found_note == test_note
-    
+
+    def test_delete_note_by_id(self, 
+        usecase: NoteUseCases, 
+        mock_bucket_adapter: ObjectStore, mock_note_repository: NoteRepository) -> None:
+
+        usecase.delete_note_by_id("test-id")
+
+        mock_note_repository.delete_by_id.assert_called_once_with("test-id")
+        
