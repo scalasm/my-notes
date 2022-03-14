@@ -30,7 +30,7 @@ class Note(DomainEntity):
         self.author_id = author_id
         self.creation_time = creation_time
         self.type = type or NoteType.FREE
-        self.tags = tags or {}
+        self.tags = tags
         self.version = version or None
 
 class NoteRepository(ABC):

@@ -155,3 +155,19 @@ def test_map_to_note() -> None:
     assert note.creation_time == note.creation_time
     assert note.tags == ["test"]
     assert note.version == 2
+
+def test_map_to_note_no_tags_should_map_to_empty_array() -> None:
+    note_model = NoteModel(
+        id = "1",
+        author_id = "mario",
+        type = "F",
+        creation_time = datetime.now(timezone.utc),
+        tags = None,
+        version = 2
+    )
+
+    note = map_to_note(note_model)
+
+    # We only want to be sure that if "tags" attribute is None,
+    # then we get an empty list for tags 
+    assert note.tags == []

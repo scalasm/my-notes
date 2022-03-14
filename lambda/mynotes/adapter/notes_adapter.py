@@ -66,9 +66,9 @@ def map_to_note_model(note: Note) -> NoteModel:
 def map_to_note(note_model: NoteModel) -> Note:
     return Note(
         id = note_model.id,
-        type=NoteType(note_model.type),
+        type = NoteType(note_model.type),
         creation_time = note_model.creation_time,
-        tags=list(note_model.tags),
+        tags = list(note_model.tags) if note_model.tags else list(),
         author_id=note_model.author_id,
         version = note_model.version
     )
