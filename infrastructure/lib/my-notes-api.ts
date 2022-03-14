@@ -76,6 +76,9 @@ export class MyNotesApiStack extends cdk.NestedStack {
       functionName: "CreateNote",
       description: "Create note",
       vpc: props.vpc,
+      vpcSubnets: {
+        subnetType: ec2.SubnetType.PRIVATE_ISOLATED,
+      },
       entry: "../lambda", // required
       index: "mynotes/port/notes.py",
       handler: "handler_create_note",
@@ -95,6 +98,9 @@ export class MyNotesApiStack extends cdk.NestedStack {
       functionName: "DeleteNote",
       description: "Delete note",
       vpc: props.vpc,
+      vpcSubnets: {
+        subnetType: ec2.SubnetType.PRIVATE_ISOLATED,
+      },
       entry: "../lambda", // required
       index: "mynotes/port/notes.py",
       handler: "handler_delete_by_id",
@@ -112,6 +118,9 @@ export class MyNotesApiStack extends cdk.NestedStack {
       functionName: "FindNoteById",
       description: "Find note by id",
       vpc: props.vpc,
+      vpcSubnets: {
+        subnetType: ec2.SubnetType.PRIVATE_ISOLATED,
+      },
       entry: "../lambda", // required
       index: "mynotes/port/notes.py",
       handler: "handler_find_by_id",
