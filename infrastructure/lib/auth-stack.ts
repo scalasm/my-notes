@@ -1,4 +1,4 @@
-// Copyright Mario Scalas 2021. All Rights Reserved.
+// Copyright Mario Scalas 2022. All Rights Reserved.
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
