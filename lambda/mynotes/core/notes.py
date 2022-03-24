@@ -6,7 +6,7 @@ from datetime import datetime
 from enum import Enum
 from typing import List
 
-from mynotes.core.architecture import (DomainEntity, ObjectStore, ResourceNotFoundException, User,
+from mynotes.core.architecture import (DataPage, DataPageQuery, DomainEntity, ObjectStore, ResourceNotFoundException, User,
                                        wrap_exceptions)
 from mynotes.core.utils.common import now
 
@@ -14,7 +14,8 @@ from mynotes.core.utils.common import now
 class NoteType(Enum):
     """Supported note types (free notes and interview notes)"""
     FREE = "F"
-    INTERVIEW = "I"
+    INTERVIEW = "I",
+    QUESTION = "Q"
 
 @dataclass
 class Note(DomainEntity):
@@ -47,7 +48,7 @@ class NoteRepository(ABC):
         pass
 
     @abstractmethod
-    def find_all(self) -> None:
+    def find_all_by_type(self, note_type: NoteType, data_page_query: DataPageQuery) -> DataPage[Note]:
         pass
 
 @wrap_exceptions

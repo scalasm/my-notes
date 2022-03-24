@@ -2,6 +2,8 @@ from typing import Any
 import pytest
 from botocore.errorfactory import ClientError
 
+from unit.mynotes.adapter.custom_boto3_mocks import aws_credentials, s3_resource
+
 from mynotes.adapter.s3_bucket_adapter import S3BucketAdapter
 
 TEST_BUCKET = "my-tests"

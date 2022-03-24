@@ -127,3 +127,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Local code snippets that I don't want to share!
+code-snippets/
