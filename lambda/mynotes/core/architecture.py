@@ -1,10 +1,11 @@
+from dataclasses import dataclass
 import logging
 import functools
 
 from abc import ABC, abstractmethod
 
 from datetime import datetime
-from typing import Any
+from typing import Any, Generic, List, TypeVar
 
 import uuid
 
@@ -39,11 +40,25 @@ class AuthorMetadata:
         self.author_id = author_id
         self.date = date
 
-class DataPage:
-    """Metadata for performing paginated queries"""
-    def __init__(self, page_size: int = 100, continuation_token: str = None) -> None:
-        self.page_size = page_size
-        self.continuation_token = continuation_token
+@dataclass
+class DataPageQuery:
+    """
+    Groups usual query parameters for a set of data.
+    """
+    page_size: int = 10
+    continuation_token: str = None
+
+# Generic data type per items in a data page
+T = TypeVar("T")
+
+@dataclass
+class DataPage(Generic[T]):
+    """
+    Standard response wrapper from a "find" (query) operation.
+    """
+    items: List[T]
+    page_size: int
+    continuation_token: str
 
 class DomainEntity:
     id: str
